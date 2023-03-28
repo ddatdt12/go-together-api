@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const LocationSchema = new Schema(
+const ULocationSchema = new Schema(
 	{
-		name: {
-			type: String,
-			required: true,
-		},
 		lat: {
 			type: Number,
 			required: true,
@@ -16,9 +12,10 @@ const LocationSchema = new Schema(
 			required: true,
 		},
 		user: {
-			type: String,
-			required: true,
+			type: Schema.Types.ObjectId,
 			ref: 'User',
+			required: true,
+			unique: true,
 		},
 	},
 	{
@@ -26,4 +23,4 @@ const LocationSchema = new Schema(
 	}
 );
 
-module.exports = mongoose.model('Location', LocationSchema);
+module.exports = mongoose.model('ULocation', ULocationSchema);

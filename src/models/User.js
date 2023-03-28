@@ -21,6 +21,10 @@ const UserSchema = new Schema(
 		photoUrl: String,
 		phoneNumber: String,
 		address: String,
+		isOnline: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{
 		timestamps: true,
