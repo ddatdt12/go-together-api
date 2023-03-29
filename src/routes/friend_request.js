@@ -7,7 +7,7 @@ const { protect } = require('../middlewares/auth');
 
 module.exports = (app) => {
 	router.get('/', protect, friendRequestController.getFriendRequests);
-	router.post('/email', protect, friendRequestController.addFriendByEmail);
+	router.post('/', protect, friendRequestController.addFriend);
 	router.put(
 		'/:friendId',
 		protect,

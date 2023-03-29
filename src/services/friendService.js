@@ -2,7 +2,7 @@ const Friend = require('../models/Friend');
 const User = require('../models/User');
 
 const friendService = {
-	getFriendUsers: async (userId) => {
+	getFriendUsers: async (userId, filter = null) => {
 		console.log('userId: ', userId);
 
 		const friends = await Friend.find({
@@ -22,13 +22,15 @@ const friendService = {
 			return friendUserId;
 		});
 
-		console.log('friendUserIds: ', friendUserIds);
-
-		const friendUsers = await User.find({
+		let friendUsersQuery = User.find({
 			_id: { $in: friendUserIds },
 		});
 
-		return friendUsers;
+		if (filter) {
+			friendUsersQuery = friendUsersQuery.find(filter);
+		}
+
+		return await friendUsersQuery;
 	},
 };
 

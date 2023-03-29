@@ -33,6 +33,7 @@ const ConnectMessageSocketServer = (server) => {
 	});
 	io.use(authHandler);
 
+	io.to;
 	require('./message')(io);
 };
 

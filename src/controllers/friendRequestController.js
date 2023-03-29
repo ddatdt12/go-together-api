@@ -21,21 +21,39 @@ const getFriendRequests = catchAsync(async (req, res) => {
 	});
 });
 
+const SUPPORTED_ADDING_METHODS = ['email', 'phoneNumber', 'id'];
+
 //@desc
 //@route        POST /api/friends/email
 //@access       PRIVATE
-const addFriendByEmail = catchAsync(async (req, res, next) => {
-	const { email } = req.body;
+const addFriend = catchAsync(async (req, res, next) => {
+	const { type } = req.body;
 
-	if (req.user.email == email) {
+	if (!SUPPORTED_ADDING_METHODS.includes(type)) {
+		return next(new AppError('Invalid type', 400));
+	}
+
+	const data = req.body[type];
+
+	if (!data) {
+		return next(new AppError('Invalid data', 400));
+	}
+
+	if (req.user[type] === req.body[type]) {
 		return next(
 			new AppError('Cannot add yourself as a friend request', 400)
 		);
 	}
 
-	const newFriend = await User.findOne({
-		email,
-	});
+	const filter = {
+		[type]: data,
+	};
+
+	if (type === 'id') {
+		filter._id = data;
+	}
+
+	const newFriend = await User.findOne(filter);
 
 	if (!newFriend) {
 		return next(new AppError('User not found', 404));
@@ -125,4 +143,4 @@ const updateFriendRequest = catchAsync(async (req, res, next) => {
 	});
 });
 
-module.exports = { getFriendRequests, addFriendByEmail, updateFriendRequest };
+module.exports = { getFriendRequests, addFriend, updateFriendRequest };

@@ -8,6 +8,13 @@ const UserSchema = new Schema(
 		email: {
 			type: String,
 			required: true,
+			unique: true,
+			validate: {
+				validator: function (v) {
+					return /^([\w-.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(v);
+				},
+				message: (props) => `${props.value} không phải là email`,
+			},
 		},
 		password: {
 			type: String,
@@ -20,7 +27,20 @@ const UserSchema = new Schema(
 			maxlength: 80,
 		},
 		photoUrl: String,
-		phoneNumber: String,
+		phoneNumber: {
+			type: String,
+			validate: {
+				validator: function (v) {
+					return /^0[0-9]{9,10}$/.test(v);
+				},
+				message: (props) =>
+					`${props.value} không phải là số điện thoại`,
+			},
+			trim: true,
+			index: true,
+			unique: true,
+			sparse: true,
+		},
 		address: String,
 		isOnline: {
 			type: Boolean,
