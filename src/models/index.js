@@ -22,4 +22,14 @@ fs.readdirSync(__dirname)
 		db[model.modelName] = model;
 	});
 
+// Ensure virtual fields are serialised.
+mongoose.set('toJSON', {
+	virtuals: true,
+});
+
+// Ensure virtual fields are serialised.
+mongoose.set('toObject', {
+	virtuals: true,
+});
+
 module.exports = db;
