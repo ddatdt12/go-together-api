@@ -1,5 +1,3 @@
-const jwt = require('jsonwebtoken');
-
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
@@ -18,7 +16,7 @@ const authenicate = catchAsync(async (req, res, next) => {
 //@access       PUBLIC
 const login = catchAsync(async (req, res, next) => {
 	const { email, password } = req.body;
-	let user = await User.findOne({ email });
+	let user = await User.findOne({ email }).select('+password');
 
 	if (!user || !(await user.comparePassword(password))) {
 		return next(new AppError('Invalid email or password', 401));

@@ -12,6 +12,7 @@ const UserSchema = new Schema(
 		password: {
 			type: String,
 			required: true,
+			select: false,
 		},
 		name: {
 			type: String,
@@ -38,15 +39,6 @@ UserSchema.pre('save', async function (next) {
 	this.password = await bcrypt.hash(this.password, salt);
 });
 
-// clear password before sending to client
-UserSchema.methods.toJSON = function () {
-	const obj = this.toObject();
-	delete obj.password;
-	obj.id = obj._id;
-	return obj;
-};
-
-// rename _id to id
 UserSchema.virtual('id').get(function () {
 	return this._id.toHexString();
 });

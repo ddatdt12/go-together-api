@@ -1,19 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const FriendSchema = new Schema(
+const FriendRequestSchema = new Schema(
 	{
-		user1: {
+		sender: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 			required: true,
 			index: true,
 		},
-		user2: {
+		receiver: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
 			required: true,
 			index: true,
+		},
+		status: {
+			type: String,
+			enum: ['pending', 'accepted', 'rejected'],
+			default: 'pending',
 		},
 	},
 	{
@@ -21,8 +26,8 @@ const FriendSchema = new Schema(
 	}
 );
 
-FriendSchema.virtual('id').get(function () {
+FriendRequestSchema.virtual('id').get(function () {
 	return this._id.toHexString();
 });
 
-module.exports = mongoose.model('Friend', FriendSchema);
+module.exports = mongoose.model('FriendRequest', FriendRequestSchema);

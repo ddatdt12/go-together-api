@@ -14,11 +14,9 @@ const protect = catchAsync(async (req, res, next) => {
 		req.headers.authorization.startsWith('Bearer')
 	) {
 		accessToken = req.headers.authorization.split(' ')[1];
-	} else if (req.cookies.accessToken) {
-		accessToken = req.cookies.accessToken;
 	}
 	if (!accessToken) {
-		return next();
+		return next(new AppError('This api require authentication', 401));
 	}
 
 	let decoded;
@@ -29,13 +27,14 @@ const protect = catchAsync(async (req, res, next) => {
 			process.env.JWT_SECRET
 		);
 	} catch (error) {
-		return next(new AppError('Invalid Token', 403));
+		return next(new AppError('This api require authentication', 401));
 	}
 
 	const currentUser = await User.findById(decoded.id);
 	if (currentUser) {
 		req.idUser = currentUser._id;
-	}
+		req.user = currentUser;
+	} else return next(new AppError('User not found', 404));
 
 	next();
 });

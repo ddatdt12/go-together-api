@@ -23,4 +23,8 @@ const ULocationSchema = new Schema(
 	}
 );
 
+ULocationSchema.virtual('id').get(function () {
+	return this._id.toHexString();
+});
+
 module.exports = mongoose.model('ULocation', ULocationSchema);
