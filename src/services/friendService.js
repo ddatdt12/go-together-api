@@ -30,7 +30,7 @@ const friendService = {
 			friendUsersQuery = friendUsersQuery.find(filter);
 		}
 
-		return await friendUsersQuery;
+		return await friendUsersQuery.populate('location');
 	},
 };
 

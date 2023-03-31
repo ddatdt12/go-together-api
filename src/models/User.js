@@ -63,6 +63,13 @@ UserSchema.virtual('id').get(function () {
 	return this._id.toHexString();
 });
 
+UserSchema.virtual('location', {
+	ref: 'ULocation',
+	localField: '_id',
+	foreignField: 'user',
+	justOne: true,
+});
+
 UserSchema.methods.comparePassword = async function (password) {
 	const isMatch = await bcrypt.compare(password, this.password);
 	this.password = undefined;
