@@ -48,4 +48,31 @@ const ConnectLocationSocketServer = (server) => {
 	require('./location')(io);
 };
 
-module.exports = { ConnectMessageSocketServer, ConnectLocationSocketServer };
+const ConnectRootSocket = (server) => {
+	const io = new Server(server, {
+		cors: { origin: '*', credentials: true },
+	});
+
+	io.on('connection', (socket) => {
+		console.log('New client connect root ' + socket.id);
+
+		socket.on('user_move', async (data) => {
+			const updatedLocation = {
+				lat: data.lat,
+				lng: data.lng,
+			};
+
+			io.emit('friend_move', updatedLocation);
+		});
+
+		socket.on('disconnect', () => {
+			console.log('Client disconnect: ' + socket.id);
+		});
+	});
+};
+
+module.exports = {
+	ConnectMessageSocketServer,
+	ConnectLocationSocketServer,
+	ConnectRootSocket,
+};
