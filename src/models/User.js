@@ -25,13 +25,17 @@ const UserSchema = new Schema(
 			type: String,
 			required: [true, 'Vui lòng nhập tên'],
 			maxlength: 80,
+			trim: true,
 		},
-		photoUrl: String,
+		photoUrl: {
+			type: String,
+			default: null,
+		},
 		phoneNumber: {
 			type: String,
 			validate: {
 				validator: function (v) {
-					return /^0[0-9]{9,10}$/.test(v);
+					return !v || /^0[0-9]{9,10}$/.test(v);
 				},
 				message: (props) =>
 					`${props.value} không phải là số điện thoại`,
@@ -40,6 +44,7 @@ const UserSchema = new Schema(
 			index: true,
 			unique: true,
 			sparse: true,
+			default: null,
 		},
 		address: String,
 		isOnline: {
