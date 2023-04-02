@@ -22,6 +22,8 @@ fs.readdirSync(__dirname)
 		db[model.modelName] = model;
 	});
 
+mongoose.set('debug', true);
+
 // Ensure virtual fields are serialised.
 mongoose.set('toJSON', {
 	virtuals: true,

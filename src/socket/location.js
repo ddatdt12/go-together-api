@@ -30,13 +30,14 @@ module.exports = (io) => {
 				})
 			).map((friend) => friend.id);
 
-			console.log('friendIds: ', friendIds);
 			const newLocation = await updateLocation(
 				socket.userId,
 				updatedLocation
 			);
 
-			socket.to(friendIds).emit('friend_move', newLocation);
+			friendIds.forEach((friendId) => {
+				socket.to(friendId).emit('friend_move', newLocation);
+			});
 		});
 
 		socket.on('update_location', (data) => {
@@ -61,7 +62,9 @@ module.exports = (io) => {
 
 const updateLocation = async (userId, data) => {
 	try {
-		let location = await ULocation.findOne({ user: userId });
+		let location = await ULocation.findOne({ user: userId }).populate(
+			'user'
+		);
 
 		if (location) {
 			location.lat = data.lat;

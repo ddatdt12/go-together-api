@@ -9,7 +9,7 @@ module.exports = (app) => {
 	router.get('/', protect, friendRequestController.getFriendRequests);
 	router.post('/', protect, friendRequestController.addFriend);
 	router.put(
-		'/:friendId',
+		'/:friendReqId',
 		protect,
 		friendRequestController.updateFriendRequest
 	);

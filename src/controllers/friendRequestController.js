@@ -3,6 +3,8 @@ const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const Friend = require('../models/Friend');
 const FriendRequest = require('../models/FriendRequest');
+const { mongoose } = require('../models');
+const Group = require('../models/Group');
 
 //@desc
 //@route        GET /api/friends
@@ -95,13 +97,13 @@ const addFriend = catchAsync(async (req, res, next) => {
 });
 
 //@desc
-//@route        PUT /api/friendRequest-request/:friendId
+//@route        PUT /api/friendRequest-request/:friendReqId
 //@access       PUBLIC
 const updateFriendRequest = catchAsync(async (req, res, next) => {
-	const { friendId } = req.params;
+	const { friendReqId } = req.params;
 	const { status } = req.body;
 
-	const friendRequest = await FriendRequest.findById(friendId);
+	const friendRequest = await FriendRequest.findById(friendReqId);
 
 	if (!friendRequest) {
 		return next(new AppError('Friend request not found', 404));
@@ -128,14 +130,55 @@ const updateFriendRequest = catchAsync(async (req, res, next) => {
 
 	friendRequest.status = status;
 
-	if (status == 'accepted') {
-		await Friend.create({
-			user1: friendRequest.sender,
-			user2: friendRequest.receiver,
-		});
+	const session = await mongoose.startSession();
+	session.startTransaction();
+	let sessionError;
+	try {
+		if (status == 'accepted') {
+			const friend = new Friend({
+				user1: friendRequest.sender,
+				user2: friendRequest.receiver,
+			});
+
+			await friend.save({ session });
+
+			const friendUsers = await User.find(
+				{
+					$or: [
+						{ _id: friendRequest.sender },
+						{ _id: friendRequest.receiver },
+					],
+				},
+				{ _id: 1, name: 1, avatar: 1 },
+				{ session }
+			);
+
+			const group = new Group({
+				members: friendUsers.map((user) => {
+					return {
+						user: user._id,
+						name: user.name,
+						avatar: user.avatar,
+					};
+				}),
+			});
+
+			await group.save({ session });
+		}
+
+		await friendRequest.save({ session });
+
+		await session.commitTransaction();
+	} catch (error) {
+		await session.abortTransaction();
+		sessionError = error;
+	} finally {
+		session.endSession();
 	}
 
-	await friendRequest.save();
+	if (sessionError) {
+		return next(sessionError);
+	}
 
 	return res.status(204).json({
 		data: friendRequest,
