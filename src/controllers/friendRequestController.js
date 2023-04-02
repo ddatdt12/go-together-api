@@ -156,7 +156,7 @@ const updateFriendRequest = catchAsync(async (req, res, next) => {
 			const group = new Group({
 				members: friendUsers.map((user) => {
 					return {
-						user: user._id,
+						userId: user._id,
 						name: user.name,
 						avatar: user.avatar,
 					};

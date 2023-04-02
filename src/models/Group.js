@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 const GroupSchema = new Schema(
 	{
+		name: {
+			type: String,
+			required: true,
+			default: 'New Group',
+		},
 		members: [
 			{
 				userId: String,
@@ -15,10 +20,14 @@ const GroupSchema = new Schema(
 			createdAt: Date,
 			senderId: String,
 		},
+		type: {
+			type: String,
+			enum: ['private', 'group'],
+			default: 'private',
+		},
 	},
 	{
 		timestamps: true,
-		typeKey: '$type',
 	}
 );
 
@@ -31,6 +40,21 @@ GroupSchema.virtual('lastMessage.sender').get(function () {
 	return this.members.find(
 		(member) => member.userId === this.lastMessage.senderId
 	);
+});
+
+GroupSchema.pre('save', function (next) {
+	if (this.members.length > 2) {
+		this.type = 'group';
+
+		if (this.name === 'New Group') {
+			this.name = this.members
+				.map((member) => member.name)
+				.join(', ')
+				.replace(/,(?!.*,)/gim, ' & ');
+		}
+	}
+
+	next();
 });
 
 module.exports = mongoose.model('Group', GroupSchema);

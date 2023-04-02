@@ -1,21 +1,17 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const ULocation = require('../models/ULocation');
+const userService = require('../services/userService');
 
 //@desc
-//@route        GET /api/me/location
-//@access       PUBLIC
-const getMyLocation = catchAsync(async (req, res, next) => {
-	const ulocation = await ULocation.findOne({ user: req.user._id });
-
-	if (!ulocation) {
-		return next(new AppError('No location found', 404));
-	}
-
+//@route        PUT /api/me
+//@access       PRIVATE
+const updateProfile = catchAsync(async (req, res, next) => {
+	const { name, avatar, phoneNumber } = req.body;
+	await userService.updateProfile(req.user.id, { name, avatar, phoneNumber });
 	res.status(200).json({
-		data: ulocation,
-		message: 'Location found',
+		message: 'Update profile successfully',
 	});
 });
 
-module.exports = { getMyLocation };
+module.exports = { updateProfile };

@@ -27,9 +27,15 @@ const UserSchema = new Schema(
 			maxlength: 80,
 			trim: true,
 		},
-		photoUrl: {
+		avatar: {
 			type: String,
 			default: null,
+			validate: {
+				validator: function (v) {
+					return !v || /^https?:\/\/.+/.test(v);
+				},
+				message: (props) => `${props.value} không phải là link ảnh`,
+			},
 		},
 		phoneNumber: {
 			type: String,
@@ -46,7 +52,6 @@ const UserSchema = new Schema(
 			sparse: true,
 			default: null,
 		},
-		address: String,
 		isOnline: {
 			type: Boolean,
 			default: false,
