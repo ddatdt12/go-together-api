@@ -35,9 +35,11 @@ module.exports = (io) => {
 				updatedLocation
 			);
 
-			friendIds.forEach((friendId) => {
-				socket.to(friendId).emit('friend_move', newLocation);
-			});
+			// friendIds.forEach((friendId) => {
+			// 	socket.to(friendId).emit('friend_move', newLocation);
+			// });
+
+			socket.to(friendIds).emit('friend_move', newLocation);
 		});
 
 		socket.on('update_location', (data) => {
